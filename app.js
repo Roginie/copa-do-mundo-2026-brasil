@@ -101,7 +101,7 @@ function calcularProbabilidades(codAdv) {
 }
 
 // ── VALIDAÇÃO RETROATIVA ─────────────────────────────────────
-// Vencedor previsto vem do placar projetado (coerente com o que é exibido).
+// Vencedor previsto vem do placar projetado (coerente com o exibido).
 // Acerto: acertou vencedor E placar (±1). Parcial: só vencedor. Erro: errou vencedor.
 function validarJogo(analise, resultado) {
   if (!resultado) return null;
@@ -286,7 +286,7 @@ function gerarTexto(jogo, a) {
   return textos[codAdv] || `Os números apontam ${a.pVitBRA > a.pVitADV ? 'favoritismo brasileiro' : 'um duelo equilibrado'}.`;
 }
 
-// ── BUSCA VIA API (enriquecimento opcional) ──────────────────
+// ── BUSCA VIA API (enriquecimento opcional, em segundo plano) ─
 async function buscarResultadosAPI() {
   try {
     const res = await fetch('https://www.thesportsdb.com/api/v1/json/3/searchteam.php?t=Brazil', { signal: AbortSignal.timeout(5000) });
@@ -298,12 +298,11 @@ async function buscarResultadosAPI() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────
-async function init() {
+function init() {
   const status = document.getElementById('status-text');
   status.textContent = 'Processando análise…';
 
-  await buscarResultadosAPI();
-
+  // Renderiza IMEDIATAMENTE com os dados reais embutidos — sem depender da rede
   const grupo = [...BASE.grupoC].sort((x, y) =>
     y.pts - x.pts || y.sg - x.sg || y.gp - x.gp);
 
@@ -313,6 +312,14 @@ async function init() {
   document.getElementById('ultima-atualizacao').textContent =
     'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   status.textContent = 'Análise carregada com dados reais';
+
+  // Enriquecimento via API roda em segundo plano (não bloqueia a renderização)
+  buscarResultadosAPI().catch(() => {});
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// Executa assim que o DOM estiver pronto (cobre o caso de o evento já ter disparado)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
