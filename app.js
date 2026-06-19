@@ -135,13 +135,13 @@ function calcularProbabilidades(codBRA, codAdv) {
 function validarJogo(analise, resultado) {
   if (!resultado) return null;
   const { golsBRA, golsADV } = resultado;
-  const { pVitBRA, pEmpate, pVitADV, placarBRA, placarADV } = analise;
+  const { placarBRA, placarADV } = analise;
 
-  // quem o modelo previa que ganharia?
-  let previsorReal;
-  if (pVitBRA > pEmpate && pVitBRA > pVitADV)  previsorReal = 'brasil';
-  else if (pVitADV > pEmpate && pVitADV > pVitBRA) previsorReal = 'adversario';
-  else                                              previsorReal = 'empate';
+  // vencedor previsto com base no PLACAR (não nas probabilidades)
+  let vencedorPrevisto;
+  if (placarBRA > placarADV)      vencedorPrevisto = 'brasil';
+  else if (placarADV > placarBRA) vencedorPrevisto = 'adversario';
+  else                            vencedorPrevisto = 'empate';
 
   // resultado real
   let vencedorReal;
@@ -149,13 +149,16 @@ function validarJogo(analise, resultado) {
   else if (golsADV > golsBRA) vencedorReal = 'adversario';
   else                        vencedorReal = 'empate';
 
-  const acertouVencedor = previsorReal === vencedorReal;
+  const acertouVencedor = vencedorPrevisto === vencedorReal;
+  const placarExato = placarBRA === golsBRA && placarADV === golsADV;
   const diffGolsBRA = Math.abs(placarBRA - golsBRA);
   const diffGolsADV = Math.abs(placarADV - golsADV);
   const placarProximo = diffGolsBRA <= 1 && diffGolsADV <= 1;
 
   let tipo, label, detalhe;
-  if (acertouVencedor && placarProximo) {
+  if (placarExato) {
+    tipo = 'acerto'; label = '✅ Acerto exato'; detalhe = `Placar previsto ${placarBRA}×${placarADV} — Real ${golsBRA}×${golsADV}`;
+  } else if (acertouVencedor && placarProximo) {
     tipo = 'acerto'; label = '✅ Acerto'; detalhe = `Previsto ${placarBRA}×${placarADV} — Real ${golsBRA}×${golsADV}`;
   } else if (acertouVencedor) {
     tipo = 'parcial'; label = '⚠️ Parcial'; detalhe = `Acertou o vencedor, placar previsto ${placarBRA}×${placarADV} — Real ${golsBRA}×${golsADV}`;
