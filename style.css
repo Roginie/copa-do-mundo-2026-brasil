@@ -1,35 +1,34 @@
 /* ============================================================
    Brasil — Copa do Mundo 2026 · Análise Preditiva
-   Design system: verde escuro, ouro, branco, cinza
+   Paleta: verde escuro / verde médio / ouro / fundos escuros
    ============================================================ */
 :root {
-  --bg: #0b1410;
-  --surface: #121d16;
-  --surface-2: #17241b;
-  --verde: #1a3c1a;
-  --verde-mid: #2f6b34;
-  --verde-claro: #5bbf67;
+  --verde-escuro: #1a3c1a;
+  --verde-medio: #2a5c2a;
   --ouro: #f5c518;
   --ouro-soft: #ffe08a;
-  --branco: #f3f7f3;
-  --cinza: #9bb0a1;
-  --cinza-fraco: #6c8174;
-  --linha: rgba(245, 197, 24, 0.14);
+  --card-1: #0f1f0f;
+  --card-2: #162616;
+  --bg: #0a160a;
+  --branco: #f1f6f1;
+  --cinza: #9bb09b;
+  --cinza-fraco: #6f856f;
+  --azul: #4d8df0;
+  --azul-soft: #82b1f7;
+  --linha: rgba(245, 197, 24, 0.16);
   --linha-suave: rgba(255, 255, 255, 0.07);
-  --vermelho: #d56a6a;
   --radius: 18px;
-  --shadow: 0 1px 0 rgba(255,255,255,0.03);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 400;
   background:
-    radial-gradient(900px 500px at 85% -10%, rgba(245,197,24,0.07), transparent 60%),
-    radial-gradient(800px 600px at 0% 0%, rgba(91,191,103,0.06), transparent 55%),
+    radial-gradient(900px 520px at 88% -10%, rgba(245,197,24,0.08), transparent 60%),
+    radial-gradient(760px 560px at 0% 0%, rgba(42,92,42,0.35), transparent 55%),
     var(--bg);
   color: var(--branco);
   line-height: 1.6;
@@ -37,81 +36,53 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3 { font-family: 'Outfit', sans-serif; line-height: 1.15; letter-spacing: -0.01em; }
-
+h1, h2, h3 { line-height: 1.14; letter-spacing: -0.01em; font-weight: 700; }
 a { color: var(--ouro); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ── HERO ───────────────────────────────────────────────── */
 .hero {
-  max-width: 1080px;
-  margin: 0 auto;
+  max-width: 1080px; margin: 0 auto;
   padding: 56px 22px 30px;
-  display: flex;
-  gap: 28px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  display: flex; gap: 28px; align-items: center; justify-content: space-between; flex-wrap: wrap;
 }
 .hero-inner { flex: 1 1 420px; }
 .kicker {
-  font-family: 'Outfit', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--ouro);
-  margin-bottom: 14px;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  font-size: 0.78rem; font-weight: 600; color: var(--ouro); margin-bottom: 14px;
 }
-.hero h1 {
-  font-size: clamp(2.3rem, 6vw, 3.6rem);
-  font-weight: 800;
-}
+.hero h1 { font-size: clamp(2.3rem, 6vw, 3.6rem); font-weight: 800; }
 .hero h1 span {
-  background: linear-gradient(100deg, var(--verde-claro), var(--ouro));
+  background: linear-gradient(100deg, var(--verde-medio), var(--ouro));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .lead { color: var(--cinza); font-size: 1.05rem; margin-top: 14px; max-width: 560px; }
 .meta-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
 .status-pill, .update-pill {
-  font-size: 0.82rem; font-weight: 500;
-  padding: 7px 14px; border-radius: 30px;
-  border: 1px solid var(--linha-suave);
-  background: var(--surface);
-  color: var(--cinza);
+  font-size: 0.82rem; font-weight: 400; padding: 7px 14px; border-radius: 30px;
+  border: 1px solid var(--linha-suave); background: var(--card-1); color: var(--cinza);
 }
-.status-pill { color: var(--verde-claro); }
+.status-pill { color: #8fd49a; }
 
 .assert-card {
-  flex: 0 0 auto;
-  width: 230px;
-  background: linear-gradient(165deg, var(--surface-2), var(--surface));
-  border: 1px solid var(--linha);
-  border-radius: var(--radius);
-  padding: 26px 22px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+  flex: 0 0 auto; width: 230px;
+  background: linear-gradient(165deg, var(--card-2), var(--card-1));
+  border: 1px solid var(--linha); border-radius: var(--radius);
+  padding: 26px 22px; text-align: center; position: relative; overflow: hidden;
 }
 .assert-card::before {
   content: ""; position: absolute; inset: 0;
-  background: radial-gradient(120px 80px at 50% 0%, rgba(245,197,24,0.18), transparent 70%);
+  background: radial-gradient(120px 80px at 50% 0%, rgba(245,197,24,0.20), transparent 70%);
 }
-.assert-num {
-  font-family: 'Outfit', sans-serif;
-  font-size: 3.4rem; font-weight: 800;
-  color: var(--ouro);
-  line-height: 1;
-  position: relative;
-}
-.assert-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--cinza); margin-top: 10px; }
+.assert-num { font-size: 3.4rem; font-weight: 800; color: var(--ouro); line-height: 1; position: relative; }
+.assert-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cinza); margin-top: 10px; }
 .assert-detalhe { font-size: 0.85rem; color: var(--branco); margin-top: 8px; opacity: 0.85; }
 
 /* ── BLOCOS ─────────────────────────────────────────────── */
 main { max-width: 1080px; margin: 0 auto; padding: 20px 22px 40px; }
 .bloco { margin-top: 54px; }
 .bloco-head { margin-bottom: 22px; }
-.bloco-head h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; }
+.bloco-head h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); }
 .bloco-head h2::after {
   content: ""; display: block; width: 46px; height: 3px; margin-top: 10px;
   background: linear-gradient(90deg, var(--ouro), transparent); border-radius: 3px;
@@ -119,149 +90,101 @@ main { max-width: 1080px; margin: 0 auto; padding: 20px 22px 40px; }
 .bloco-head p { color: var(--cinza); margin-top: 10px; max-width: 620px; }
 
 /* ── TABELA GRUPO ───────────────────────────────────────── */
-.table-wrap {
-  border: 1px solid var(--linha-suave);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--surface);
-}
+.table-wrap { border: 1px solid var(--linha-suave); border-radius: var(--radius); overflow: hidden; background: var(--card-1); }
 .tabela { width: 100%; border-collapse: collapse; min-width: 480px; }
 .tabela thead th {
-  font-family: 'Outfit', sans-serif;
   font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--cinza-fraco); font-weight: 700;
-  padding: 14px 10px; text-align: center;
-  border-bottom: 1px solid var(--linha-suave);
+  color: var(--cinza-fraco); font-weight: 600;
+  padding: 14px 10px; text-align: center; border-bottom: 1px solid var(--linha-suave);
 }
 .tabela th.th-time { text-align: left; padding-left: 18px; }
-.tabela tbody td {
-  padding: 14px 10px; text-align: center; font-size: 0.95rem;
-  border-bottom: 1px solid var(--linha-suave);
-  color: var(--branco);
-}
+.tabela tbody td { padding: 14px 10px; text-align: center; font-size: 0.95rem; border-bottom: 1px solid var(--linha-suave); }
 .tabela tbody tr:last-child td { border-bottom: none; }
 .tabela tbody td:nth-child(2) { text-align: left; padding-left: 18px; font-weight: 500; }
 .tabela tbody tr:hover { background: rgba(255,255,255,0.02); }
-.pts-cell { font-weight: 800; color: var(--ouro); font-family: 'Outfit'; }
-.row-brasil { background: rgba(245, 197, 24, 0.07) !important; }
+.pts-cell { font-weight: 800; color: var(--ouro); }
+.row-brasil { background: rgba(245, 197, 24, 0.09) !important; }
 .row-brasil td:first-child { box-shadow: inset 3px 0 0 var(--ouro); }
 .row-brasil td:nth-child(2) { color: var(--ouro-soft); font-weight: 700; }
 
 /* ── GRID DE JOGOS ──────────────────────────────────────── */
-.jogos-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
+.jogos-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 .loading { color: var(--cinza); padding: 40px; text-align: center; }
 
-.jogo-card {
-  background: var(--surface);
-  border: 1px solid var(--linha-suave);
-  border-radius: var(--radius);
-  overflow: hidden;
-  transition: border-color 0.25s, transform 0.25s;
-}
+.jogo-card { background: var(--card-1); border: 1px solid var(--linha-suave); border-radius: var(--radius); overflow: hidden; transition: border-color 0.25s, transform 0.25s; }
 .jogo-card:hover { border-color: var(--linha); transform: translateY(-2px); }
-
 .jogo-card-header {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 14px 20px;
-  background: rgba(255,255,255,0.02);
-  border-bottom: 1px solid var(--linha-suave);
-  font-size: 0.82rem;
+  padding: 14px 20px; background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--linha-suave); font-size: 0.82rem;
 }
-.jogo-rodada { font-family: 'Outfit'; font-weight: 700; color: var(--ouro); }
+.jogo-rodada { font-weight: 700; color: var(--ouro); }
 .jogo-data { color: var(--cinza); }
 .jogo-status { margin-left: auto; font-weight: 600; padding: 4px 12px; border-radius: 20px; font-size: 0.74rem; }
-.status-finalizado { background: rgba(155,176,161,0.15); color: var(--cinza); }
+.status-finalizado { background: rgba(155,176,155,0.15); color: var(--cinza); }
 .status-ao-vivo { background: rgba(213,106,106,0.18); color: #ff8a8a; }
-.status-futuro { background: rgba(91,191,103,0.15); color: var(--verde-claro); }
+.status-futuro { background: rgba(42,92,42,0.4); color: #8fd49a; }
 
 .jogo-card-body { padding: 22px 20px; }
-
 .confronto { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .time { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
 .time-bandeira { font-size: 2.6rem; line-height: 1; }
-.time-nome { font-family: 'Outfit'; font-weight: 600; font-size: 1.05rem; }
+.time-nome { font-weight: 600; font-size: 1.05rem; }
 .time-nome.brasil { color: var(--ouro-soft); }
 
 .placar-box { flex: 0 0 auto; text-align: center; min-width: 96px; }
-.placar-real { font-family: 'Outfit'; font-size: 2.4rem; font-weight: 800; color: var(--branco); }
-.placar-vs { font-family: 'Outfit'; font-weight: 700; color: var(--cinza-fraco); font-size: 1.1rem; }
+.placar-real { font-size: 2.4rem; font-weight: 800; color: var(--branco); }
+.placar-vs { font-weight: 700; color: var(--cinza-fraco); font-size: 1.1rem; }
 .placar-previsto-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cinza-fraco); margin-top: 6px; }
-.placar-previsto-val { font-family: 'Outfit'; font-size: 1.7rem; font-weight: 800; color: var(--verde-claro); }
+.placar-previsto-val { font-size: 1.7rem; font-weight: 800; color: #8fd49a; }
 
-/* chips de info */
 .info-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; justify-content: center; }
-.info-chip {
-  font-size: 0.78rem; color: var(--cinza);
-  background: var(--surface-2); border: 1px solid var(--linha-suave);
-  padding: 6px 12px; border-radius: 20px;
-}
+.info-chip { font-size: 0.78rem; color: var(--cinza); background: var(--card-2); border: 1px solid var(--linha-suave); padding: 6px 12px; border-radius: 20px; }
 
-/* barra de probabilidade */
+/* barra de probabilidade — amarelo / cinza / azul */
 .prob-section { margin-top: 22px; }
 .prob-label-row, .prob-pct-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
 .prob-label-row { color: var(--cinza); margin-bottom: 8px; }
 .prob-label-row span:first-child { color: var(--ouro-soft); font-weight: 600; }
-.prob-bar-wrap {
-  display: flex; height: 16px; border-radius: 10px; overflow: hidden;
-  background: rgba(255,255,255,0.05); gap: 2px;
-}
-.prob-bar-brasil, .prob-bar-empate, .prob-bar-adversario {
-  height: 100%; transition: width 1.1s cubic-bezier(.22,.61,.36,1);
-}
-.prob-bar-brasil { background: linear-gradient(90deg, var(--verde-mid), var(--ouro)); }
+.prob-bar-wrap { display: flex; height: 16px; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.05); gap: 2px; }
+.prob-bar-brasil, .prob-bar-empate, .prob-bar-adversario { height: 100%; transition: width 1.1s cubic-bezier(.22,.61,.36,1); }
+.prob-bar-brasil { background: linear-gradient(90deg, var(--verde-medio), var(--ouro)); }
 .prob-bar-empate { background: var(--cinza-fraco); }
-.prob-bar-adversario { background: linear-gradient(90deg, #8a4a4a, var(--vermelho)); }
-.prob-pct-row { margin-top: 8px; font-family: 'Outfit'; font-weight: 700; }
+.prob-bar-adversario { background: linear-gradient(90deg, #2f5fa8, var(--azul)); }
+.prob-pct-row { margin-top: 8px; font-weight: 700; }
 .pct-brasil { color: var(--ouro); }
 .pct-empate { color: var(--cinza); }
-.pct-adversario { color: var(--vermelho); }
+.pct-adversario { color: var(--azul-soft); }
 
-/* confiança */
 .confianca-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 18px; font-size: 0.85rem; color: var(--cinza); }
 .estrelas { color: var(--ouro); letter-spacing: 2px; font-size: 1rem; }
 
 .analise-texto {
-  margin-top: 16px; padding: 14px 16px;
-  background: var(--surface-2);
-  border-left: 3px solid var(--verde-mid);
-  border-radius: 0 12px 12px 0;
-  color: #cdd9cf; font-size: 0.92rem; line-height: 1.6;
+  margin-top: 16px; padding: 14px 16px; background: var(--card-2);
+  border-left: 3px solid var(--verde-medio); border-radius: 0 12px 12px 0;
+  color: #cfdccf; font-size: 0.92rem; line-height: 1.6; font-weight: 300;
 }
 
-/* countdown */
 .countdown-box { margin-top: 16px; text-align: center; }
 .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--cinza-fraco); }
-.countdown-timer { font-family: 'Outfit'; font-weight: 800; font-size: 1.4rem; color: var(--verde-claro); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.countdown-timer { font-weight: 800; font-size: 1.4rem; color: #8fd49a; margin-top: 4px; font-variant-numeric: tabular-nums; }
 
-/* validação */
 .validacao-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--linha-suave); }
 .validacao-badge { font-weight: 700; font-size: 0.85rem; padding: 5px 14px; border-radius: 20px; white-space: nowrap; }
-.badge-acerto { background: rgba(91,191,103,0.18); color: var(--verde-claro); }
+.badge-acerto { background: rgba(73,141,73,0.22); color: #8fd49a; }
 .badge-parcial { background: rgba(245,197,24,0.16); color: var(--ouro); }
 .badge-erro { background: rgba(213,106,106,0.16); color: #ff8a8a; }
 .validacao-detalhe { font-size: 0.82rem; color: var(--cinza); }
 
 /* ── COMO FUNCIONA ──────────────────────────────────────── */
 .cf-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.cf-item {
-  background: var(--surface); border: 1px solid var(--linha-suave);
-  border-radius: var(--radius); padding: 24px;
-}
-.cf-item.destaque { border-color: var(--linha); background: linear-gradient(160deg, var(--surface-2), var(--surface)); }
-.cf-num { font-family: 'Outfit'; font-weight: 800; font-size: 1.1rem; color: var(--ouro); opacity: 0.6; }
-.cf-item h3 { font-size: 1.1rem; margin: 8px 0 8px; font-weight: 700; }
-.cf-item p { color: var(--cinza); font-size: 0.92rem; }
+.cf-item { background: var(--card-1); border: 1px solid var(--linha-suave); border-radius: var(--radius); padding: 24px; }
+.cf-item.destaque { border-color: var(--linha); background: linear-gradient(160deg, var(--card-2), var(--card-1)); }
+.cf-num { font-weight: 800; font-size: 1.1rem; color: var(--ouro); opacity: 0.6; }
+.cf-item h3 { font-size: 1.1rem; margin: 8px 0; }
+.cf-item p { color: var(--cinza); font-size: 0.92rem; font-weight: 300; }
 
-/* ── FOOTER ─────────────────────────────────────────────── */
-footer {
-  max-width: 1080px; margin: 30px auto 0; padding: 30px 22px 50px;
-  border-top: 1px solid var(--linha-suave);
-  text-align: center; color: var(--cinza-fraco); font-size: 0.85rem;
-}
+footer { max-width: 1080px; margin: 30px auto 0; padding: 30px 22px 50px; border-top: 1px solid var(--linha-suave); text-align: center; color: var(--cinza-fraco); font-size: 0.85rem; }
 footer .assinatura { margin-top: 6px; }
 
 /* ── RESPONSIVO ─────────────────────────────────────────── */
