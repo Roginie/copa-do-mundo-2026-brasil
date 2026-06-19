@@ -3,82 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Copa do Brasil 2026 — Análise Probabilística</title>
-  <meta name="description" content="Análise probabilística dos favoritos ao título da Copa do Brasil 2026 e simulador de confrontos entre times." />
+  <title>Brasil na Copa do Mundo 2026 — Análise Preditiva</title>
+  <meta name="description" content="Projeções jogo a jogo da Seleção Brasileira no Grupo C da Copa do Mundo 2026, com validação dos palpites contra os resultados reais." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-
   <header class="hero">
-    <div class="trophy">🏆</div>
-    <h1>COPA DO BRASIL <span>2026</span></h1>
-    <p class="subtitle">Análise probabilística dos favoritos ao título</p>
-    <p class="disclaimer">Modelo baseado na força dos times (elenco, títulos e histórico). Estimativa para fins de estudo — não reflete resultados oficiais do chaveamento.</p>
-    <nav>
-      <a href="#ranking">Favoritos</a>
-      <a href="#simulador">Simulador</a>
-      <a href="#metodologia">Metodologia</a>
-    </nav>
+    <div class="hero-inner">
+      <p class="kicker">Copa do Mundo 2026 · Grupo C</p>
+      <h1>A jornada do <span>Brasil</span></h1>
+      <p class="lead">Projeções jogo a jogo a partir de ranking, histórico de confrontos e forma recente — e a checagem honesta de cada palpite contra o que aconteceu em campo.</p>
+      <div class="meta-bar">
+        <span id="status-text" class="status-pill">Carregando…</span>
+        <span id="ultima-atualizacao" class="update-pill"></span>
+      </div>
+    </div>
+    <aside class="assert-card" aria-label="Índice de assertividade do modelo">
+      <div class="assert-num" id="assert-val">—</div>
+      <div class="assert-label">Índice de assertividade</div>
+      <div class="assert-detalhe" id="assert-detalhe">Aguardando dados</div>
+    </aside>
   </header>
 
   <main>
-    <section id="ranking">
-      <h2>Ranking de Favoritos ao Título</h2>
-      <p class="section-desc">Probabilidade calculada a partir do <strong>índice de poder</strong> de cada time. Quanto mais forte o elenco e o histórico, maior a chance.</p>
-      <div id="ranking-list" class="ranking-list"></div>
-    </section>
-
-    <section id="simulador">
-      <h2>Simulador de Confronto</h2>
-      <p class="section-desc">Escolha dois times e veja quem teria mais chance de vencer num confronto direto.</p>
-      <div class="sim-box">
-        <div class="sim-team">
-          <label for="teamA">Time A</label>
-          <select id="teamA"></select>
-        </div>
-        <div class="versus">VS</div>
-        <div class="sim-team">
-          <label for="teamB">Time B</label>
-          <select id="teamB"></select>
-        </div>
+    <section class="bloco">
+      <div class="bloco-head">
+        <h2>Classificação do Grupo C</h2>
+        <p>Como está a chave do Brasil na fase de grupos.</p>
       </div>
-      <button id="simBtn" class="sim-btn">Simular Confronto</button>
-      <div id="sim-result" class="sim-result"></div>
+      <div class="table-wrap">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>#</th><th class="th-time">Seleção</th>
+              <th>J</th><th>V</th><th>E</th><th>D</th>
+              <th>GP</th><th>GC</th><th>SG</th><th>Pts</th>
+            </tr>
+          </thead>
+          <tbody id="grupo-body"></tbody>
+        </table>
+      </div>
     </section>
 
-    <section id="metodologia">
-      <h2>Como funciona a análise</h2>
-      <div class="metodo-grid">
-        <div class="metodo-card">
-          <h3>1. Índice de Poder</h3>
-          <p>Cada time recebe uma nota de 0 a 100 com base na força do elenco, investimento, desempenho recente e tradição na Copa do Brasil.</p>
+    <section class="bloco">
+      <div class="bloco-head">
+        <h2>Os jogos do Brasil</h2>
+        <p>Cada partida com a projeção, a explicação por trás dos números e — quando o jogo já passou — a validação do palpite.</p>
+      </div>
+      <div id="jogos-grid" class="jogos-grid">
+        <div class="loading">Carregando análise…</div>
+      </div>
+    </section>
+
+    <section class="bloco como-funciona">
+      <div class="bloco-head">
+        <h2>Como funciona</h2>
+        <p>Uma análise estatística baseada em dados históricos — sem achismo.</p>
+      </div>
+      <div class="cf-grid">
+        <div class="cf-item">
+          <span class="cf-num">01</span>
+          <h3>Os indicadores</h3>
+          <p>Ranking FIFA das seleções, retrospecto de confrontos diretos, forma recente (aproveitamento) e média de gols. Cada um pesa de forma diferente no cálculo.</p>
         </div>
-        <div class="metodo-card">
-          <h3>2. Probabilidade de Título</h3>
-          <p>A chance de cada time é proporcional ao seu índice elevado a uma potência (favorece os mais fortes), normalizada para somar 100% entre os candidatos.</p>
+        <div class="cf-item">
+          <span class="cf-num">02</span>
+          <h3>A projeção</h3>
+          <p>Os indicadores viram uma força relativa entre as seleções, que é convertida em probabilidade de vitória, empate e derrota, além de um placar e uma faixa de gols esperados.</p>
         </div>
-        <div class="metodo-card">
-          <h3>3. Confronto Direto</h3>
-          <p>Num jogo entre A e B, a chance de vitória é calculada comparando os índices dos dois (modelo parecido com o de força relativa / Elo).</p>
+        <div class="cf-item">
+          <span class="cf-num">03</span>
+          <h3>A validação</h3>
+          <p>Quando o jogo acontece, o palpite é comparado com o resultado real. Acertar o vencedor ou ficar a até um gol do placar conta como acerto — e isso alimenta o índice de assertividade.</p>
         </div>
-        <div class="metodo-card warn">
-          <h3>⚠️ Importante</h3>
-          <p>É um modelo estatístico ilustrativo. Futebol tem zebra, lesão, momento e fator casa. Os números mostram tendência, não certeza.</p>
+        <div class="cf-item destaque">
+          <span class="cf-num">★</span>
+          <h3>Transparência</h3>
+          <p>Modelo preditivo de ciência de dados esportivos. Números mostram tendência, não certeza — futebol tem fator casa, lesão e o imprevisível. Por isso cada projeção vem com um nível de confiança.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>Feito por <a href="https://github.com/Roginie">Roginiê Almeida</a> · Copa do Brasil 2026 · Análise probabilística</p>
+    <p class="fonte">Fontes: dados históricos verificados · enriquecimento via <a href="https://www.thesportsdb.com" rel="noopener" target="_blank">TheSportsDB</a></p>
+    <p class="assinatura">Análise e desenvolvimento por <a href="https://github.com/Roginie">Roginiê Almeida</a></p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
