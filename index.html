@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copa do Brasil 2026 — Análise Probabilística</title>
+  <meta name="description" content="Análise probabilística dos favoritos ao título da Copa do Brasil 2026 e simulador de confrontos entre times." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <header class="hero">
+    <div class="trophy">🏆</div>
+    <h1>COPA DO BRASIL <span>2026</span></h1>
+    <p class="subtitle">Análise probabilística dos favoritos ao título</p>
+    <p class="disclaimer">Modelo baseado na força dos times (elenco, títulos e histórico). Estimativa para fins de estudo — não reflete resultados oficiais do chaveamento.</p>
+    <nav>
+      <a href="#ranking">Favoritos</a>
+      <a href="#simulador">Simulador</a>
+      <a href="#metodologia">Metodologia</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="ranking">
+      <h2>Ranking de Favoritos ao Título</h2>
+      <p class="section-desc">Probabilidade calculada a partir do <strong>índice de poder</strong> de cada time. Quanto mais forte o elenco e o histórico, maior a chance.</p>
+      <div id="ranking-list" class="ranking-list"></div>
+    </section>
+
+    <section id="simulador">
+      <h2>Simulador de Confronto</h2>
+      <p class="section-desc">Escolha dois times e veja quem teria mais chance de vencer num confronto direto.</p>
+      <div class="sim-box">
+        <div class="sim-team">
+          <label for="teamA">Time A</label>
+          <select id="teamA"></select>
+        </div>
+        <div class="versus">VS</div>
+        <div class="sim-team">
+          <label for="teamB">Time B</label>
+          <select id="teamB"></select>
+        </div>
+      </div>
+      <button id="simBtn" class="sim-btn">Simular Confronto</button>
+      <div id="sim-result" class="sim-result"></div>
+    </section>
+
+    <section id="metodologia">
+      <h2>Como funciona a análise</h2>
+      <div class="metodo-grid">
+        <div class="metodo-card">
+          <h3>1. Índice de Poder</h3>
+          <p>Cada time recebe uma nota de 0 a 100 com base na força do elenco, investimento, desempenho recente e tradição na Copa do Brasil.</p>
+        </div>
+        <div class="metodo-card">
+          <h3>2. Probabilidade de Título</h3>
+          <p>A chance de cada time é proporcional ao seu índice elevado a uma potência (favorece os mais fortes), normalizada para somar 100% entre os candidatos.</p>
+        </div>
+        <div class="metodo-card">
+          <h3>3. Confronto Direto</h3>
+          <p>Num jogo entre A e B, a chance de vitória é calculada comparando os índices dos dois (modelo parecido com o de força relativa / Elo).</p>
+        </div>
+        <div class="metodo-card warn">
+          <h3>⚠️ Importante</h3>
+          <p>É um modelo estatístico ilustrativo. Futebol tem zebra, lesão, momento e fator casa. Os números mostram tendência, não certeza.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Feito por <a href="https://github.com/Roginie">Roginiê Almeida</a> · Copa do Brasil 2026 · Análise probabilística</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
