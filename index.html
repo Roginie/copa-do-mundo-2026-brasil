@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brasil na Copa do Mundo 2026 — Análise Preditiva</title>
-  <meta name="description" content="Análise preditiva dos jogos do Brasil no Grupo C da Copa do Mundo 2026: probabilidades, placar projetado e validação contra os resultados reais." />
+  <meta name="description" content="Análise preditiva dos jogos do Brasil no Grupo C da Copa do Mundo 2026: modelo Elo + Poisson, probabilidades, placares prováveis e validação contra os resultados reais." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <header class="hero">
     <div class="hero-inner">
       <p class="kicker">Copa do Mundo 2026 · Grupo C</p>
       <h1>A jornada do <span>Brasil</span></h1>
-      <p class="lead">Projeções jogo a jogo a partir de ranking, histórico de confrontos e forma recente — e a checagem honesta de cada palpite contra o que aconteceu em campo.</p>
+      <p class="lead">Projeções jogo a jogo com um modelo de <strong>força Elo + Poisson</strong> — e a checagem honesta de cada palpite contra o que aconteceu em campo.</p>
       <div class="meta-bar">
         <span id="status-text" class="status-pill">Carregando…</span>
         <span id="ultima-atualizacao" class="update-pill"></span>
@@ -51,7 +51,7 @@
     <section class="bloco">
       <div class="bloco-head">
         <h2>Os jogos do Brasil</h2>
-        <p>Cada partida com a projeção, a explicação por trás dos números e — quando o jogo já passou — a validação do palpite.</p>
+        <p>Cada partida com a projeção, os placares mais prováveis e — quando o jogo já passou — a validação do palpite.</p>
       </div>
       <div id="jogos-grid" class="jogos-grid">
         <div class="loading">Carregando análise…</div>
@@ -61,28 +61,28 @@
     <section class="bloco como-funciona">
       <div class="bloco-head">
         <h2>Como funciona</h2>
-        <p>Uma análise estatística baseada em dados históricos — sem achismo.</p>
+        <p>Uma análise estatística baseada em dados — sem achismo.</p>
       </div>
       <div class="cf-grid">
         <div class="cf-item">
           <span class="cf-num">01</span>
-          <h3>Os indicadores</h3>
-          <p>Ranking FIFA das seleções, retrospecto de confrontos diretos, forma recente e média de gols. Cada fator pesa de forma diferente no cálculo.</p>
+          <h3>Força (Elo)</h3>
+          <p>Cada seleção recebe uma força a partir dos <strong>pontos FIFA</strong> (escala tipo Elo), ajustada pelo histórico de confrontos e pela forma recente — com peso menor para amostras pequenas.</p>
         </div>
         <div class="cf-item">
           <span class="cf-num">02</span>
-          <h3>A projeção</h3>
-          <p>Os indicadores viram uma força relativa entre as seleções, convertida em probabilidade de vitória, empate e derrota, mais um placar e os gols esperados.</p>
+          <h3>Gols (Poisson)</h3>
+          <p>Dessa força saem os gols esperados (λ) de cada lado. Um modelo de <strong>Poisson (Dixon-Coles)</strong> transforma os λ na probabilidade de cada placar.</p>
         </div>
         <div class="cf-item">
           <span class="cf-num">03</span>
-          <h3>A validação</h3>
-          <p>Quando o jogo acontece, o palpite é comparado ao resultado real. Acertar o vencedor e o placar (±1 gol) alimenta o índice de assertividade.</p>
+          <h3>Probabilidades</h3>
+          <p>Vitória, empate, derrota e o placar mais provável saem todos da <strong>mesma matriz</strong> de placares — de forma coerente, sem fórmulas separadas.</p>
         </div>
         <div class="cf-item destaque">
-          <span class="cf-num">★</span>
-          <h3>Transparência</h3>
-          <p>Modelo preditivo de ciência de dados esportivos. Os números mostram tendência, não certeza — por isso cada projeção vem com um nível de confiança.</p>
+          <span class="cf-num">04</span>
+          <h3>Validação</h3>
+          <p>Quando o jogo acontece, o vencedor mais provável é comparado ao resultado real. Acertar o vencedor e o placar (±1 gol) alimenta o índice de assertividade.</p>
         </div>
       </div>
     </section>
@@ -93,6 +93,6 @@
     <p class="assinatura">Análise e desenvolvimento por <a href="https://github.com/Roginie">Roginiê Almeida</a></p>
   </footer>
 
-  <script defer src="app.js?v=3"></script>
+  <script defer src="app.js?v=4"></script>
 </body>
 </html>
