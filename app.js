@@ -1,12 +1,28 @@
 /* ============================================================
    Copa do Mundo 2026 — Análise Preditiva do Brasil (Grupo C)
-   Dados reais embutidos (fallback) + overlay automático via data.json
+   Motor: força Elo (pontos FIFA) + gols via Poisson (Dixon-Coles simplificado)
+   Dados embutidos (fallback) + overlay automático via data.json
    HTML + CSS + JS puro · roda direto no GitHub Pages
    ============================================================ */
 
+// ── CONFIG DO MODELO (idealmente calibrada contra histórico) ──
+// Os pesos abaixo seriam ajustados minimizando erro vs. resultados
+// reais (ex.: log-loss). Os valores são um ponto de partida sensato.
+const CONFIG = {
+  pesos: { elo: 0.50, h2h: 0.20, forma: 0.30 }, // soma = 1
+  h2hShrinkage: 5,   // pseudo-jogos: puxa o H2H para 0.5 quando há poucos confrontos
+  eloDivisor: 600,   // escala da expectativa Elo (padrão FIFA)
+  mediaGols: 1.30,   // gols médios por seleção/jogo (nível-base do Poisson)
+  tiltForca: 0.75,   // o quanto a força combinada desloca os λ
+  rhoDC: -0.05,      // ajuste Dixon-Coles nos placares baixos (calibrável)
+  maxGols: 8,        // truncamento da matriz de Poisson
+};
+
 // ── DADOS REAIS (fallback embutido — sempre funciona offline) ─
 const BASE = {
-  rankingFIFA: { BRA: 5, MAR: 11, SCO: 38, HAI: 85 },
+  // Pontos FIFA (escala tipo Elo). PLACEHOLDERS — confira/atualize com os
+  // pontos OFICIAIS atuais em https://inside.fifa.com/fifa-world-ranking
+  pontosFIFA: { BRA: 1860, MAR: 1700, SCO: 1500, HAI: 1320 },
 
   h2h: {
     'BRA-MAR': { jogos: 4, vBRA: 2, e: 1, vADV: 1, golsBRA: 6, golsADV: 4 },
@@ -14,8 +30,9 @@ const BASE = {
     'BRA-SCO': { jogos: 2, vBRA: 2, e: 0, vADV: 0, golsBRA: 4, golsADV: 1 },
   },
 
-  forma: { BRA: 0.60, MAR: 0.72, SCO: 0.58, HAI: 0.40 },
-  mediagols: { BRA: 1.8, MAR: 1.5, SCO: 1.4, HAI: 0.9 },
+  forma: { BRA: 0.60, MAR: 0.72, SCO: 0.58, HAI: 0.40 }, // aproveitamento últimos 10
+  mediagols:    { BRA: 1.8, MAR: 1.5, SCO: 1.4, HAI: 0.9 }, // gols marcados/jogo (ataque)
+  golsSofridos: { BRA: 0.7, MAR: 0.9, SCO: 1.1, HAI: 1.6 }, // gols sofridos/jogo (defesa) — estimativa
 
   jogos: [
     {
@@ -51,62 +68,123 @@ const BASE = {
   ],
 };
 
-// ── MOTOR DE ANÁLISE ─────────────────────────────────────────
-function calcularProbabilidades(codAdv) {
-  const h2h = BASE.h2h[`BRA-${codAdv}`] || { jogos: 0, vBRA: 0, e: 0, vADV: 0 };
+// ── FORÇA COMBINADA: Elo + H2H (com encolhimento) + forma ─────
+function forcaCombinada(codAdv) {
+  // Expectativa Elo a partir dos pontos FIFA (ΔR/600)
+  const dR = BASE.pontosFIFA.BRA - BASE.pontosFIFA[codAdv];
+  const eElo = 1 / (1 + Math.pow(10, -dR / CONFIG.eloDivisor));
 
-  const rBRA = 1 / BASE.rankingFIFA.BRA;
-  const rADV = 1 / BASE.rankingFIFA[codAdv];
-  const forcaRank = rBRA / (rBRA + rADV);
+  // H2H com shrinkage em direção a 0.5 (amostra pequena = pouca confiança)
+  const h = BASE.h2h[`BRA-${codAdv}`] || { jogos: 0, vBRA: 0, e: 0 };
+  const h2hRaw = h.jogos > 0 ? (h.vBRA + 0.5 * h.e) / h.jogos : 0.5;
+  const k0 = CONFIG.h2hShrinkage;
+  const h2hShrunk = (h2hRaw * h.jogos + 0.5 * k0) / (h.jogos + k0);
 
-  let forcaH2H = 0.5;
-  if (h2h.jogos > 0) forcaH2H = (h2h.vBRA + 0.5 * h2h.e) / h2h.jogos;
+  // Forma recente (aproveitamento relativo)
+  const forma = BASE.forma.BRA / (BASE.forma.BRA + BASE.forma[codAdv]);
 
-  const forcaForma = BASE.forma.BRA / (BASE.forma.BRA + BASE.forma[codAdv]);
+  const w = CONFIG.pesos;
+  const forca = w.elo * eElo + w.h2h * h2hShrunk + w.forma * forma;
+  return { forca, eElo, h2hShrunk, forma };
+}
 
-  const peso = { rank: 0.35, h2h: 0.40, forma: 0.25 };
-  const forca = forcaRank * peso.rank + forcaH2H * peso.h2h + forcaForma * peso.forma;
+// ── λ (GOLS ESPERADOS) via ataque/defesa + tilt da força ──────
+function calcularLambdas(codAdv, forca) {
+  const AVG = CONFIG.mediaGols;
+  const ataqueBRA = BASE.mediagols.BRA / AVG;
+  const defesaADV = BASE.golsSofridos[codAdv] / AVG;
+  const ataqueADV = BASE.mediagols[codAdv] / AVG;
+  const defesaBRA = BASE.golsSofridos.BRA / AVG;
 
-  const diff = forca - 0.5;
-  let pVitBRA, pEmpate, pVitADV;
-  pEmpate = Math.max(0.10, Math.min(0.40, 0.28 - Math.abs(diff) * 0.5));
-  if (diff >= 0) {
-    pVitBRA = forca * (1 - pEmpate * 0.5);
-    pVitADV = 1 - pVitBRA - pEmpate;
-  } else {
-    pVitADV = (1 - forca) * (1 - pEmpate * 0.5);
-    pVitBRA = 1 - pVitADV - pEmpate;
+  // base Dixon-Coles multiplicativa + inclinação pela força combinada
+  let lamBRA = AVG * ataqueBRA * defesaADV * Math.pow(forca / 0.5, CONFIG.tiltForca);
+  let lamADV = AVG * ataqueADV * defesaBRA * Math.pow((1 - forca) / 0.5, CONFIG.tiltForca);
+
+  lamBRA = Math.min(6, Math.max(0.15, lamBRA));
+  lamADV = Math.min(6, Math.max(0.15, lamADV));
+  return { lamBRA, lamADV };
+}
+
+// ── POISSON + MATRIZ DE PLACARES ──────────────────────────────
+function fatorial(n) { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
+function poisson(k, lambda) { return Math.exp(-lambda) * Math.pow(lambda, k) / fatorial(k); }
+
+// Correção Dixon-Coles para placares baixos (rho calibrável)
+function tauDC(i, j, lamA, lamB, rho) {
+  if (i === 0 && j === 0) return 1 - lamA * lamB * rho;
+  if (i === 0 && j === 1) return 1 + lamA * rho;
+  if (i === 1 && j === 0) return 1 + lamB * rho;
+  if (i === 1 && j === 1) return 1 - rho;
+  return 1;
+}
+
+function matrizPlacares(lamBRA, lamADV) {
+  const N = CONFIG.maxGols, m = [];
+  let soma = 0;
+  for (let i = 0; i <= N; i++) {
+    m[i] = [];
+    for (let j = 0; j <= N; j++) {
+      let p = poisson(i, lamBRA) * poisson(j, lamADV) * tauDC(i, j, lamBRA, lamADV, CONFIG.rhoDC);
+      if (p < 0) p = 0;
+      m[i][j] = p; soma += p;
+    }
   }
-  pVitBRA = Math.max(0.03, Math.min(0.95, pVitBRA));
-  pVitADV = Math.max(0.03, Math.min(0.95, pVitADV));
-  const soma = pVitBRA + pEmpate + pVitADV;
-  pVitBRA /= soma; pEmpate /= soma; pVitADV /= soma;
+  for (let i = 0; i <= N; i++) for (let j = 0; j <= N; j++) m[i][j] /= soma; // normaliza
+  return m;
+}
 
-  const xgBRA = +(BASE.mediagols.BRA * forca * 1.1).toFixed(1);
-  const xgADV = +(BASE.mediagols[codAdv] * (1 - forca) * 1.1).toFixed(1);
+// Vitória/empate/derrota, placar mais provável e top placares — TUDO da matriz
+function derivarDaMatriz(m) {
+  let pVitBRA = 0, pEmpate = 0, pVitADV = 0, best = { p: -1, i: 0, j: 0 };
+  const cels = [];
+  for (let i = 0; i < m.length; i++) for (let j = 0; j < m[i].length; j++) {
+    const p = m[i][j];
+    if (i > j) pVitBRA += p; else if (i === j) pEmpate += p; else pVitADV += p;
+    if (p > best.p) best = { p, i, j };
+    cels.push({ i, j, p });
+  }
+  cels.sort((a, b) => b.p - a.p);
+  return { pVitBRA, pEmpate, pVitADV, placar: best, top: cels.slice(0, 5) };
+}
 
-  const confianca = h2h.jogos >= 5 ? 5 : h2h.jogos >= 3 ? 4 : h2h.jogos >= 1 ? 3 : 2;
+// ── ANÁLISE COMPLETA DE UM CONFRONTO ──────────────────────────
+function calcularProbabilidades(codAdv) {
+  const f = forcaCombinada(codAdv);
+  const { lamBRA, lamADV } = calcularLambdas(codAdv, f.forca);
+  const m = matrizPlacares(lamBRA, lamADV);
+  const r = derivarDaMatriz(m);
 
+  const h = BASE.h2h[`BRA-${codAdv}`] || { jogos: 0 };
+  const confianca = h.jogos >= 5 ? 5 : h.jogos >= 3 ? 4 : h.jogos >= 1 ? 3 : 2;
+
+  const topMax = r.top[0].p || 1;
   return {
-    pVitBRA: Math.round(pVitBRA * 100),
-    pEmpate: Math.round(pEmpate * 100),
-    pVitADV: Math.round(pVitADV * 100),
-    placarBRA: Math.round(xgBRA),
-    placarADV: Math.round(xgADV),
-    xgBRA, xgADV, confianca,
+    pVitBRA: Math.round(r.pVitBRA * 100),
+    pEmpate: Math.round(r.pEmpate * 100),
+    pVitADV: Math.round(r.pVitADV * 100),
+    placarBRA: r.placar.i,
+    placarADV: r.placar.j,
+    lamBRA: +lamBRA.toFixed(2),
+    lamADV: +lamADV.toFixed(2),
+    eElo: Math.round(f.eElo * 100),
+    confianca,
+    top: r.top.map(c => ({ s: `${c.i}×${c.j}`, pct: Math.round(c.p * 100), rel: Math.round((c.p / topMax) * 100) })),
   };
 }
 
 // ── VALIDAÇÃO RETROATIVA ─────────────────────────────────────
+// Vencedor previsto = PROBABILIDADE DOMINANTE (não o placar projetado).
+// Placar (±1 gol) é só critério extra para "acerto cheio".
 function validarJogo(analise, resultado) {
   if (!resultado) return null;
   const { golsBRA, golsADV } = resultado;
-  const { placarBRA, placarADV } = analise;
+  const { pVitBRA, pEmpate, pVitADV, placarBRA, placarADV } = analise;
 
-  const sinal = (a, b) => (a > b ? 'brasil' : a < b ? 'adversario' : 'empate');
-  const previsto = sinal(placarBRA, placarADV);
-  const real = sinal(golsBRA, golsADV);
+  let previsto = 'empate';
+  if (pVitBRA >= pEmpate && pVitBRA >= pVitADV) previsto = 'brasil';
+  else if (pVitADV >= pEmpate && pVitADV >= pVitBRA) previsto = 'adversario';
 
+  const real = golsBRA > golsADV ? 'brasil' : golsADV > golsBRA ? 'adversario' : 'empate';
   const acertouVencedor = previsto === real;
   const placarProximo = Math.abs(placarBRA - golsBRA) <= 1 && Math.abs(placarADV - golsADV) <= 1;
 
@@ -176,7 +254,7 @@ function renderJogos(jogos) {
     } else {
       placarHtml = `
         <div class="placar-vs">VS</div>
-        <div class="placar-previsto-label">Projeção</div>
+        <div class="placar-previsto-label">Mais provável</div>
         <div class="placar-previsto-val">${a.placarBRA} – ${a.placarADV}</div>`;
     }
 
@@ -197,6 +275,18 @@ function renderJogos(jogos) {
       <div class="info-row" style="margin-top:10px">
         ${jogo.resultadoReal.marcadores.map(m => `<span class="info-chip">⚽ ${m}</span>`).join('')}
       </div>` : '';
+
+    // Top placares mais prováveis (da matriz de Poisson)
+    const placaresHtml = `
+      <div class="placares">
+        <div class="placares-titulo">Placares mais prováveis</div>
+        ${a.top.map(t => `
+          <div class="pl-row">
+            <span class="pl-score">${t.s}</span>
+            <span class="pl-bar"><i style="width:${Math.max(6, t.rel)}%"></i></span>
+            <span class="pl-pct">${t.pct}%</span>
+          </div>`).join('')}
+      </div>`;
 
     const dataFmt = new Date(jogo.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
@@ -227,13 +317,16 @@ function renderJogos(jogos) {
               <span class="pct-adversario">${a.pVitADV}%</span>
             </div>
           </div>
+          ${placaresHtml}
           <div class="info-row">
-            <span class="info-chip">📊 xG Brasil: ${a.xgBRA}</span>
-            <span class="info-chip">📊 xG ${jogo.adversario}: ${a.xgADV}</span>
-            <span class="info-chip">🌐 FIFA: #${BASE.rankingFIFA.BRA} vs #${BASE.rankingFIFA[jogo.codAdv]}</span>
+            <span class="info-chip">λ Brasil: ${a.lamBRA}</span>
+            <span class="info-chip">λ ${jogo.adversario}: ${a.lamADV}</span>
+            <span class="info-chip">Base Elo: ${a.eElo}%</span>
+            <span class="info-chip">FIFA: ${BASE.pontosFIFA.BRA} vs ${BASE.pontosFIFA[jogo.codAdv]} pts</span>
           </div>
           <div class="confianca-row"><span>Confiança da projeção:</span><span class="estrelas">${estrelas(a.confianca)}</span></div>
           <p class="analise-texto">${gerarTexto(jogo, a)}</p>
+          <p class="modelo-nota">Modelo: força Elo (pontos FIFA) + gols via Poisson (Dixon-Coles simplificado).</p>
           ${countdownHtml}
           ${validacaoHtml}
         </div>
@@ -267,46 +360,36 @@ function gerarTexto(jogo, a) {
   const { codAdv, adversario, finalizado, resultadoReal } = jogo;
   if (finalizado && resultadoReal) {
     const { golsBRA, golsADV } = resultadoReal;
-    if (golsBRA === golsADV) return `O empate refletiu o equilíbrio que os números apontavam. O ${adversario} tem qualidade para incomodar, e confirmou isso em campo.`;
-    if (golsBRA > golsADV) return `Vitória dentro do esperado. O Brasil confirmou o favoritismo e seguiu firme rumo à classificação.`;
+    if (golsBRA === golsADV) return `O empate ficou dentro do leque de placares prováveis. O ${adversario} tem qualidade para incomodar, e confirmou isso em campo.`;
+    if (golsBRA > golsADV) return `Vitória dentro do esperado. O Brasil confirmou o favoritismo que os números apontavam e seguiu firme rumo à classificação.`;
     return `Resultado fora da curva — a tendência apontava o Brasil como favorito. Futebol tem margem de surpresa, e esse jogo caiu nela.`;
   }
   const textos = {
-    HAI: `O retrospecto é direto: três vitórias do Brasil nos confrontos anteriores, 17 a 1 no agregado. O Haiti se fecha bem, mas a diferença técnica é grande. A tendência é de vitória brasileira com folga.`,
-    SCO: `A Escócia chega embalada e com defesa organizada, mas o histórico pende para o Brasil nos dois duelos anteriores. Os números apontam vantagem brasileira num jogo que pode decidir o grupo.`,
-    MAR: `Marrocos foi semifinalista em 2022 e tem peças de alto nível na Europa. O empate em 2023 mostra que dá trabalho. Confronto parelho, com leve vantagem brasileira no retrospecto.`,
+    HAI: `O retrospecto é direto e a diferença de nível também: o modelo concentra a maior parte da probabilidade numa vitória brasileira por dois ou três gols.`,
+    SCO: `A Escócia chega organizada e embalada, mas os pontos FIFA e o histórico pendem para o Brasil. Os números apontam vantagem brasileira num jogo que pode decidir o grupo.`,
+    MAR: `Marrocos foi semifinalista em 2022 e é forte. A força combinada dá leve favoritismo ao Brasil, mas o empate aparece com peso real na distribuição de placares.`,
   };
-  return textos[codAdv] || `Os números apontam ${a.pVitBRA > a.pVitADV ? 'favoritismo brasileiro' : 'um duelo equilibrado'}.`;
+  return textos[codAdv] || `A tendência aponta ${a.pVitBRA > a.pVitADV ? 'favoritismo brasileiro' : 'um duelo equilibrado'}.`;
 }
 
-// ── OVERLAY AUTOMÁTICO via data.json (mantido por GitHub Action) ─
-// Lê os resultados/standings mais recentes da mesma origem (sem CORS).
+// ── OVERLAY AUTOMÁTICO via data.json ─────────────────────────
 async function aplicarDataJson() {
   try {
     const res = await fetch('./data.json?ts=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(6000) });
     if (!res.ok) return false;
     const data = await res.json();
     let mudou = false;
-
     if (data.resultados) {
       BASE.jogos.forEach(j => {
         const r = data.resultados[j.id] || data.resultados[String(j.id)];
         if (r && typeof r.golsBRA === 'number' && typeof r.golsADV === 'number') {
-          j.resultadoReal = r;
-          j.finalizado = true;
-          mudou = true;
+          j.resultadoReal = r; j.finalizado = true; mudou = true;
         }
       });
     }
-    if (Array.isArray(data.grupoC) && data.grupoC.length) {
-      BASE.grupoC = data.grupoC;
-      mudou = true;
-    }
-    if (data.atualizadoEm) window.__dataAtualizadoEm = data.atualizadoEm;
+    if (Array.isArray(data.grupoC) && data.grupoC.length) { BASE.grupoC = data.grupoC; mudou = true; }
     return mudou;
-  } catch {
-    return false; // sem data.json: usa os dados embutidos
-  }
+  } catch { return false; }
 }
 
 function renderTudo() {
@@ -320,18 +403,13 @@ async function init() {
   const status = document.getElementById('status-text');
   status.textContent = 'Processando análise…';
 
-  // 1) Render imediato com os dados embutidos (nunca trava na rede)
-  renderTudo();
+  renderTudo(); // render imediato com os dados embutidos (não trava na rede)
   document.getElementById('ultima-atualizacao').textContent =
     'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  status.textContent = 'Análise carregada com dados reais';
+  status.textContent = 'Análise carregada · modelo Elo + Poisson';
 
-  // 2) Em segundo plano: aplica o data.json (atualizado pela automação) e re-renderiza
-  const mudou = await aplicarDataJson();
-  if (mudou) {
-    renderTudo();
-    status.textContent = 'Dados atualizados automaticamente';
-  }
+  const mudou = await aplicarDataJson(); // em segundo plano
+  if (mudou) { renderTudo(); status.textContent = 'Dados atualizados automaticamente'; }
 }
 
 if (document.readyState === 'loading') {
