@@ -3,117 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Análise preditiva dos jogos do Brasil na Copa do Mundo 2026 — dados reais, validação retroativa e probabilidades por confronto." />
-  <title>Brasil na Copa 2026 — Análise Preditiva</title>
+  <title>Brasil na Copa do Mundo 2026 — Análise Preditiva</title>
+  <meta name="description" content="Análise preditiva dos jogos do Brasil no Grupo C da Copa do Mundo 2026: probabilidades, placar projetado e validação contra os resultados reais." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
-
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-flag">🇧🇷</div>
-      <div class="header-text">
-        <h1>Brasil na Copa do Mundo 2026</h1>
-        <p>Análise preditiva · Grupo C · Dados atualizados</p>
-      </div>
-      <div id="assertividade-badge" class="assert-badge">
-        <span class="assert-label">Assertividade</span>
-        <span class="assert-value" id="assert-val">—</span>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="kicker">Copa do Mundo 2026 · Grupo C</p>
+      <h1>A jornada do <span>Brasil</span></h1>
+      <p class="lead">Projeções jogo a jogo a partir de ranking, histórico de confrontos e forma recente — e a checagem honesta de cada palpite contra o que aconteceu em campo.</p>
+      <div class="meta-bar">
+        <span id="status-text" class="status-pill">Carregando…</span>
+        <span id="ultima-atualizacao" class="update-pill"></span>
       </div>
     </div>
+    <aside class="assert-card" aria-label="Índice de assertividade do modelo">
+      <div class="assert-num" id="assert-val">—</div>
+      <div class="assert-label">Assertividade no vencedor</div>
+      <div class="assert-detalhe" id="assert-detalhe">Aguardando dados</div>
+    </aside>
   </header>
 
-  <!-- BARRA DE STATUS -->
-  <div class="status-bar">
-    <div class="status-inner">
-      <span id="status-text">🔄 Carregando dados...</span>
-      <span id="ultima-atualizacao"></span>
-    </div>
-  </div>
-
-  <!-- CLASSIFICAÇÃO DO GRUPO -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Classificação — Grupo C</h2>
+  <main>
+    <section class="bloco">
+      <div class="bloco-head">
+        <h2>Classificação do Grupo C</h2>
+        <p>Como está a chave do Brasil na fase de grupos.</p>
+      </div>
       <div class="table-wrap">
-        <table class="tabela-grupo" id="tabela-grupo">
+        <table class="tabela">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Seleção</th>
-              <th>J</th>
-              <th>V</th>
-              <th>E</th>
-              <th>D</th>
-              <th>GP</th>
-              <th>GC</th>
-              <th>SG</th>
-              <th>Pts</th>
+              <th>#</th><th class="th-time">Seleção</th>
+              <th>J</th><th>V</th><th>E</th><th>D</th>
+              <th>GP</th><th>GC</th><th>SG</th><th>Pts</th>
             </tr>
           </thead>
-          <tbody id="grupo-body">
-            <tr><td colspan="10" class="loading-cell">Carregando...</td></tr>
-          </tbody>
+          <tbody id="grupo-body"></tbody>
         </table>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- JOGOS DO BRASIL -->
-  <section class="section section-dark">
-    <div class="container">
-      <h2 class="section-title">Jornada do Brasil</h2>
-      <p class="section-sub">Resultados reais + análise preditiva com validação</p>
-      <div class="jogos-grid" id="jogos-grid">
-        <!-- cards gerados pelo JS -->
+    <section class="bloco">
+      <div class="bloco-head">
+        <h2>Os jogos do Brasil</h2>
+        <p>Cada partida com a projeção, a explicação por trás dos números e — quando o jogo já passou — a validação do palpite.</p>
       </div>
-    </div>
-  </section>
+      <div id="jogos-grid" class="jogos-grid">
+        <div class="loading">Carregando análise…</div>
+      </div>
+    </section>
 
-  <!-- METODOLOGIA -->
-  <section class="section" id="como-funciona">
-    <div class="container">
-      <h2 class="section-title">Como funciona a análise</h2>
-      <div class="metodologia-grid">
-        <div class="metodo-card">
-          <div class="metodo-icon">📊</div>
-          <h3>Dados históricos H2H</h3>
-          <p>Confrontos diretos entre as seleções em Copas do Mundo e competições oficiais. Quanto mais partidas, maior o peso no modelo.</p>
+    <section class="bloco como-funciona">
+      <div class="bloco-head">
+        <h2>Como funciona</h2>
+        <p>Uma análise estatística baseada em dados históricos — sem achismo.</p>
+      </div>
+      <div class="cf-grid">
+        <div class="cf-item">
+          <span class="cf-num">01</span>
+          <h3>Os indicadores</h3>
+          <p>Ranking FIFA das seleções, retrospecto de confrontos diretos, forma recente e média de gols. Cada fator pesa de forma diferente no cálculo.</p>
         </div>
-        <div class="metodo-card">
-          <div class="metodo-icon">🏆</div>
-          <h3>Ranking FIFA</h3>
-          <p>A posição no ranking reflete a força relativa de cada seleção com base em resultados recentes ponderados por importância da competição.</p>
+        <div class="cf-item">
+          <span class="cf-num">02</span>
+          <h3>A projeção</h3>
+          <p>Os indicadores viram uma força relativa entre as seleções, convertida em probabilidade de vitória, empate e derrota, mais um placar e os gols esperados.</p>
         </div>
-        <div class="metodo-card">
-          <div class="metodo-icon">📈</div>
-          <h3>Forma recente</h3>
-          <p>Desempenho nas Eliminatórias e amistosos preparatórios. Aproveitamento, gols marcados e sofridos nos últimos 10 jogos.</p>
+        <div class="cf-item">
+          <span class="cf-num">03</span>
+          <h3>A validação</h3>
+          <p>Quando o jogo acontece, o palpite é comparado ao resultado real. Acertar o vencedor e o placar (±1 gol) alimenta o índice de assertividade.</p>
         </div>
-        <div class="metodo-card">
-          <div class="metodo-icon">✅</div>
-          <h3>Validação retroativa</h3>
-          <p>O modelo é testado contra jogos já realizados. O índice de assertividade reflete acertos reais — não estimativas teóricas.</p>
+        <div class="cf-item destaque">
+          <span class="cf-num">★</span>
+          <h3>Transparência</h3>
+          <p>Modelo preditivo de ciência de dados esportivos. Os números mostram tendência, não certeza — por isso cada projeção vem com um nível de confiança.</p>
         </div>
       </div>
-      <div class="disclaimer">
-        <strong>Importante:</strong> análise estatística baseada em dados históricos. Futebol tem zebra, lesão e fator emocional. Os números apontam tendências — não garantias.
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container">
-      <p>Feito por <a href="https://github.com/Roginie" target="_blank">Roginiê Almeida</a> · Copa do Mundo 2026 · Análise preditiva com dados reais</p>
-      <p class="footer-fontes">Fontes: FIFA, TheSportsDB, dados históricos de confrontos diretos</p>
-    </div>
+  <footer>
+    <p class="fonte">Fontes: dados históricos verificados · enriquecimento via <a href="https://www.thesportsdb.com" rel="noopener" target="_blank">TheSportsDB</a></p>
+    <p class="assinatura">Análise e desenvolvimento por <a href="https://github.com/Roginie">Roginiê Almeida</a></p>
   </footer>
 
-  <script src="app.js"></script>
+  <script defer src="app.js?v=3"></script>
 </body>
 </html>
