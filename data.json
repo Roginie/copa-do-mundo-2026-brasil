@@ -1,0 +1,13 @@
+{
+  "atualizadoEm": "2026-06-23",
+  "resultados": {
+    "1": { "golsBRA": 1, "golsADV": 1, "marcadores": ["Vinícius Jr (32')", "Saibari (21')"] },
+    "2": { "golsBRA": 3, "golsADV": 0 }
+  },
+  "grupoC": [
+    { "pos": 1, "cod": "BRA", "nome": "Brasil",   "flag": "🇧🇷", "j": 2, "v": 1, "e": 1, "d": 0, "gp": 4, "gc": 1, "sg": 3,  "pts": 4 },
+    { "pos": 2, "cod": "SCO", "nome": "Escócia",  "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "j": 1, "v": 1, "e": 0, "d": 0, "gp": 1, "gc": 0, "sg": 1,  "pts": 3 },
+    { "pos": 3, "cod": "MAR", "nome": "Marrocos", "flag": "🇲🇦", "j": 1, "v": 0, "e": 1, "d": 0, "gp": 1, "gc": 1, "sg": 0,  "pts": 1 },
+    { "pos": 4, "cod": "HAI", "nome": "Haiti",    "flag": "🇭🇹", "j": 2, "v": 0, "e": 0, "d": 2, "gp": 0, "gc": 4, "sg": -4, "pts": 0 }
+  ]
+}
