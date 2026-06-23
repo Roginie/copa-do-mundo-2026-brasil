@@ -484,3 +484,13 @@ a { color: inherit; text-decoration: none; }
   .tabela-grupo { font-size: .78rem; }
   .tabela-grupo th, .tabela-grupo td { padding: 10px 8px; }
 }
+
+/* ── Placares mais prováveis (matriz de Poisson) ───────────── */
+.placares { margin-top: 18px; }
+.placares-titulo { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cinza-fraco); margin-bottom: 10px; }
+.pl-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.pl-score { font-weight: 700; font-size: 0.85rem; width: 42px; color: var(--branco); font-variant-numeric: tabular-nums; }
+.pl-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+.pl-bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--verde-medio), var(--ouro)); border-radius: 6px; }
+.pl-pct { font-size: 0.8rem; color: var(--cinza); width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+.modelo-nota { font-size: 0.78rem; color: var(--cinza-fraco); margin-top: 12px; font-weight: 300; }
